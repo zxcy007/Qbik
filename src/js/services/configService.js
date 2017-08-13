@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('configService', function(storageService, lodash, $log, $timeout, $rootScope, platformInfo) {
+angular.module('copayApp.services').factory('configService', function(storageService, lodash, $log, $timeout, $rootScope, platformInfo, networkService) {
   var root = {};
 
   var isWindowsPhoneApp = platformInfo.isCordova && platformInfo.isWP;
@@ -14,9 +14,8 @@ angular.module('copayApp.services').factory('configService', function(storageSer
 
     // Bitcore wallet service URL
     bws: {
-      url: 'https://bws.bitcoin.com/bws/api',
+      url: 'https://bwsbcc.bitcoin.com/bws/api',
     },
-
     download: {
       bitpay: {
         url: 'https://wallet.bitcoin.com'
@@ -52,16 +51,10 @@ angular.module('copayApp.services').factory('configService', function(storageSer
       totalCopayers: 3,
       spendUnconfirmed: false,
       reconnectDelay: 5000,
-      idleDurationMin: 4,
-      settings: {
-        unitName: 'BTC',
-        unitToSatoshi: 100000000,
-        unitDecimals: 8,
-        unitCode: 'btc',
-        alternativeName: 'US Dollar',
-        alternativeIsoCode: 'USD',
-      }
+      idleDurationMin: 4
     },
+
+    currencyNetworks: networkService.defaultConfig(),
 
     lock: {
       method: null,
@@ -76,10 +69,6 @@ angular.module('copayApp.services').factory('configService', function(storageSer
 
     hideNextSteps: {
       enabled: isWindowsPhoneApp ? true : false,
-    },
-
-    rates: {
-      url: 'https://insight.bitpay.com:443/api/rates',
     },
 
     release: {
@@ -127,20 +116,15 @@ angular.module('copayApp.services').factory('configService', function(storageSer
         configCache = JSON.parse(localConfig);
 
         //these ifs are to avoid migration problems
-        if (!configCache.bws) {
-          configCache.bws = defaultConfig.bws;
+        if (!configCache.currencyNetworks) {
+          configCache.currencyNetworks = defaultConfig.currencyNetworks;
         }
         if (!configCache.wallet) {
           configCache.wallet = defaultConfig.wallet;
         }
-        if (!configCache.wallet.settings.unitCode) {
-          configCache.wallet.settings.unitCode = defaultConfig.wallet.settings.unitCode;
-        }
-
         if (!configCache.hideNextSteps) {
           configCache.hideNextSteps = defaultConfig.hideNextSteps;
         }
-
         if (!configCache.recentTransactions) {
           configCache.recentTransactions = defaultConfig.recentTransactions;
         }
